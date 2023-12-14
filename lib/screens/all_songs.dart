@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:music_player/constants/routes.dart';
+import 'package:music_player/screens/song_screen.dart';
 import 'package:music_player/sevices/get_songs_service.dart';
 import 'package:music_player/sevices/just_audio.dart';
 import 'package:on_audio_query/on_audio_query.dart';
@@ -72,10 +75,11 @@ class _AllSongsState extends State<AllSongs> {
                         title: Text(item.data![index].title),
                         subtitle: Text(item.data![index].artist ?? "No Artist"),
                         // trailing: const Icon(Icons.arrow_forward_rounded),
-                        onTap: () => player
-                            .playSong((item.data![index].data).toString()),
-                        // This Widget will query/load image.
-                        // You can use/create your own widget/method using [queryArtwork].
+                        onTap: () {
+                           Get.to(SongScreen(song: item.data![index]));
+                           player.playSong((item.data![index].data).toString());
+                           },
+                        
                         leading:
                             _audioServics.getArtworkWidget(item.data![index].id),
                       );
