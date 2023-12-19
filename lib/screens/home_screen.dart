@@ -16,7 +16,7 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         appBar:  _CustomAppBar(),
         body: AllSongs(),
-        bottomNavigationBar:  _CustomBottomNavBar(),
+        // bottomNavigationBar:  _CustomBottomNavBar(),
       ),
     );
   }
