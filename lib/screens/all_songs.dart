@@ -73,7 +73,7 @@ class _AllSongsState extends State<AllSongs> {
                         subtitle: Text(item.data![index].artist ?? "No Artist"),
                         // trailing: const Icon(Icons.arrow_forward_rounded),
                         onTap: () async {
-                            Get.to(()=> SongScreen(index: index,allSongs: item.data)
+                            Get.to(()=> SongScreen(allSongs: item.data)
                             );
                          await AudioService.playSongs(
                               (item.data![index].data).toString(),index,item.data!);

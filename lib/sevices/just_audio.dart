@@ -9,7 +9,12 @@ class AudioService {
   static List<AudioSource> _allSongs = [];
   static ProcessingState processingStateLoading = ProcessingState.loading;
   static ProcessingState processingStateBuffering = ProcessingState.buffering;
-  static bool isPlaying = player.playing;
+  static ProcessingState processingStateComplete = ProcessingState.completed;
+  static ProcessingState processingStateReady = ProcessingState.ready;
+
+  static Stream<bool> isPlaying = player.playingStream;
+  static Stream<int?> curSong = player.currentIndexStream;
+  
 
   static final playlist = ConcatenatingAudioSource(
     // Start loading next item just before reaching it

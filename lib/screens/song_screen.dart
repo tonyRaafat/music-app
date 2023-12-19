@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:music_player/sevices/get_songs_service.dart';
 import 'package:music_player/sevices/just_audio.dart';
@@ -7,10 +8,9 @@ import 'package:rxdart/rxdart.dart' as rxdart;
 // import 'package:on_audio_query/on_audio_query.dart';
 
 class SongScreen extends StatefulWidget {
-  var index;
+  // var index;
   final allSongs;
-  SongScreen({Key? key, required this.index, required this.allSongs})
-      : super(key: key);
+  SongScreen({Key? key, required this.allSongs}) : super(key: key);
 
   @override
   State<SongScreen> createState() => _SongScreenState();
@@ -40,36 +40,42 @@ class _SongScreenState extends State<SongScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(2, 20, 2, 60),
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _getSongs.getArtworkWidget(widget.allSongs![widget.index].id,
-                  artHeight: 250, artWidth: 250, nullIconSize: 250),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 50, 10, 30),
-                child: Row(
-                  // mainAxisAlignment: MainAxisAlignment.start,
+        child: StreamBuilder<int?>(
+            stream: AudioService.curSong,
+            builder: (context, snapshot) {
+              return Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Flexible(
-                      child: Text(widget.allSongs![widget.index].title,
-                          style: const TextStyle(fontSize: 20)),
+                    _getSongs.getArtworkWidget(
+                        widget.allSongs![snapshot.data].id,
+                        artHeight: 250,
+                        artWidth: 250,
+                        nullIconSize: 250),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 50, 10, 30),
+                      child: Row(
+                        // mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Flexible(
+                            child: Text(widget.allSongs![snapshot.data].title,
+                                style: const TextStyle(fontSize: 20)),
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
-              
-              StreamBuilder<SeekBarData>(
-                  stream: _seekbarDataStream,
-                  builder: (context, snapshot) {
-                    final positionData = snapshot.data;
-                    return SeekBar(
-                      position: positionData?.position ?? Duration.zero,
-                      duration: positionData?.duration ?? Duration.zero,
-                      onChangeEnd: AudioService.player.seek,
-                    );
-                  }),
-              PlayerController(),
-            ]),
+                    StreamBuilder<SeekBarData>(
+                        stream: _seekbarDataStream,
+                        builder: (context, snapshot) {
+                          final positionData = snapshot.data;
+                          return SeekBar(
+                            position: positionData?.position ?? Duration.zero,
+                            duration: positionData?.duration ?? Duration.zero,
+                            onChangeEnd: AudioService.player.seek,
+                          );
+                        }),
+                    PlayerController(),
+                  ]);
+            }),
       ),
     );
   }
@@ -82,8 +88,6 @@ class _SongScreenState extends State<SongScreen> {
         IconButton(
             onPressed: () {
               AudioService.prevSong();
-              widget.index = widget.index - 1;
-              setState(() {});
             },
             icon: const Icon(
               Icons.skip_previous_rounded,
@@ -104,24 +108,17 @@ class _SongScreenState extends State<SongScreen> {
                     margin: const EdgeInsets.all(10),
                     child: const CircularProgressIndicator(),
                   );
-                } else if (!AudioService.isPlaying) {
-                  return IconButton(
-                    onPressed: () {
-                      AudioService.pauseAndPlaySong();   
-                    },
-                    icon: const Icon(
-                      Icons.play_circle_filled_rounded,
-                      size: 70,
-                    ),
-                  );
-                } else if (proccesingState != ProcessingState.completed) {
-                  return IconButton(
-                    onPressed: () => AudioService.pauseAndPlaySong(),
-                    icon: const Icon(
-                      Icons.pause_circle_filled_rounded,
-                      size: 70,
-                    ),
-                  );
+                } else if (proccesingState == AudioService.processingStateComplete || proccesingState == AudioService.processingStateReady ) {
+                  return StreamBuilder<bool>(
+                      stream: AudioService.isPlaying,
+                      builder: (context, snapshot) {
+                        return IconButton(
+                          iconSize: 70,
+                            icon: snapshot.data == true
+                                ? const Icon(Icons.pause_circle_filled)
+                                : const Icon(Icons.play_circle_fill),
+                            onPressed: () => AudioService.pauseAndPlaySong());
+                      });
                 } else {
                   return const CircularProgressIndicator();
                 }
@@ -132,8 +129,8 @@ class _SongScreenState extends State<SongScreen> {
         IconButton(
             onPressed: () {
               AudioService.nextSong();
-              widget.index = widget.index + 1;
-              setState(() {});
+              // widget.index = widget.index + 1;
+              // setState(() {});
             },
             icon: const Icon(
               Icons.skip_next_rounded,
