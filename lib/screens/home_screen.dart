@@ -60,8 +60,10 @@ class _CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       iconTheme: IconThemeData(color: Colors.white),
       backgroundColor: Colors.transparent,
+      
       elevation: 0,
-      leading: const Icon(Icons.grid_view_rounded),
+      title: Text('Hello, Music World'),
+      // leading: const Icon(Icons.grid_view_rounded),
     );
   }
 
